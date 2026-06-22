@@ -319,11 +319,12 @@
             padding: 40px;
         }
 
-        .card-word {
-            font-size: 3em;
+        .card-meaning {
+            font-size: 2em;
             font-weight: bold;
             color: #667eea;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+            text-align: center;
         }
 
         .card-pos {
@@ -497,6 +498,11 @@
             </div>
 
             <div class="input-group">
+                <label for="meaning">中文意思 *</label>
+                <input type="text" id="meaning" placeholder="例：漂亮、美麗" required>
+            </div>
+
+            <div class="input-group">
                 <label for="translation">例句中文翻譯 (選填)</label>
                 <textarea id="translation" placeholder="例：美麗的夕陽將天空染成橙色和粉紅色。" style="min-height: 60px;"></textarea>
             </div>
@@ -533,7 +539,7 @@
         <div id="study" class="tab-content">
             <h2>單字卡 - 本週複習</h2>
             <div class="info-box">
-                <strong>📅 本週單字：</strong><span id="weekInfo"></span> | 點擊卡片翻轉查看答案
+                <strong>📅 本週單字：</strong><span id="weekInfo"></span> | 點擊卡片翻轉 | 正面：英文單字 ↔ 反面：中文意思 + 例句
             </div>
             
             <div class="card-container">
@@ -546,13 +552,13 @@
 
                 <div id="cardArea" class="card" onclick="toggleCard()">
                     <div class="card-front">
-                        <p style="color: #999; margin-bottom: 20px;">例句</p>
+                        <p style="color: #999; margin-bottom: 20px;">英文單字</p>
                         <div id="sentenceDisplay" style="font-size: 1.2em; line-height: 1.8; color: #333;"></div>
-                        <div class="card-hint">點擊卡片查看答案</div>
+                        <div class="card-hint">點擊卡片查看中文意思</div>
                     </div>
                     <div class="card-back">
-                        <div class="card-word" id="answerWord"></div>
-                        <div class="card-pos" id="answerPos"></div>
+                        <div style="font-size: 2em; font-weight: bold; color: #667eea; margin-bottom: 30px; text-align: center;" id="answerWord"></div>
+                        <div class="card-pos" id="answerPos" style="display: none;"></div>
                         <div class="card-sentence" id="answerSentence"></div>
                     </div>
                 </div>
@@ -603,10 +609,11 @@
             const word = document.getElementById('word').value.trim();
             const pos = document.getElementById('pos').value;
             const sentence = document.getElementById('sentence').value.trim();
+            const meaning = document.getElementById('meaning').value.trim();
             const translation = document.getElementById('translation').value.trim();
             const messageEl = document.getElementById('message');
 
-            if (!word || !pos || !sentence) {
+            if (!word || !pos || !sentence || !meaning) {
                 messageEl.innerHTML = '<span style="color: #ff6b6b;">❌ 請填寫必填欄位</span>';
                 return;
             }
@@ -617,6 +624,7 @@
                 word: word,
                 pos: pos,
                 sentence: sentence,
+                meaning: meaning,
                 translation: translation,
                 date: today,
                 createTime: new Date().toLocaleString('zh-TW')
@@ -638,6 +646,7 @@
             document.getElementById('word').value = '';
             document.getElementById('pos').value = '';
             document.getElementById('sentence').value = '';
+            document.getElementById('meaning').value = '';
             document.getElementById('translation').value = '';
             document.getElementById('word').focus();
         }
@@ -685,6 +694,7 @@
                     html += `<div class="vocab-item">
                         <div class="vocab-info">
                             <div class="vocab-word">${item.word}</div>
+                            <div style="font-size: 1.1em; color: #667eea; font-weight: 600; margin-bottom: 8px;">${item.meaning}</div>
                             <div class="vocab-meta">
                                 <span class="tag">${item.pos}</span>
                             </div>
@@ -756,16 +766,22 @@
             const card = weekVocabs[currentCardIndex];
             const progress = ((currentCardIndex + 1) / weekVocabs.length * 100).toFixed(0);
 
-            // 挖空單字在例句中
-            const sentenceWithBlank = card.sentence.replace(
-                new RegExp(`\\b${card.word}\\b`, 'gi'),
-                '________'
-            );
+            // 正面：英文單字 + 詞性
+            document.getElementById('sentenceDisplay').innerHTML = `
+                <div class="card-word" style="font-size: 2.5em; margin-bottom: 30px;">${card.word}</div>
+                <div class="card-pos">${card.pos}</div>
+            `;
 
-            document.getElementById('sentenceDisplay').textContent = sentenceWithBlank;
-            document.getElementById('answerWord').textContent = card.word;
-            document.getElementById('answerPos').textContent = card.pos;
-            document.getElementById('answerSentence').textContent = card.sentence;
+            // 反面：中文意思 + 例句
+            document.getElementById('answerWord').textContent = card.meaning;
+            document.getElementById('answerPos').textContent = '';
+            document.getElementById('answerSentence').innerHTML = `
+                <div style="margin-top: 20px; border-top: 1px solid #ddd; padding-top: 20px;">
+                    <div style="font-size: 0.9em; color: #999; margin-bottom: 10px;">例句</div>
+                    <div style="font-size: 1em; color: #555; line-height: 1.6;">${card.sentence}</div>
+                </div>
+            `;
+
             document.getElementById('cardStats').innerHTML = `
                 ${currentCardIndex + 1} / ${weekVocabs.length} 
                 <div class="progress-bar">
