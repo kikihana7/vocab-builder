@@ -233,6 +233,13 @@
             font-size: 0.85em;
         }
 
+        .vocab-meaning {
+            font-size: 1em;
+            color: #667eea;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
         .vocab-sentence {
             font-size: 0.95em;
             color: #555;
@@ -252,7 +259,6 @@
             margin-bottom: 10px;
         }
 
-        /* 卡片模式樣式 */
         .card-container {
             display: flex;
             flex-direction: column;
@@ -319,12 +325,11 @@
             padding: 40px;
         }
 
-        .card-meaning {
-            font-size: 2em;
+        .card-word {
+            font-size: 2.5em;
             font-weight: bold;
             color: #667eea;
             margin-bottom: 30px;
-            text-align: center;
         }
 
         .card-pos {
@@ -448,6 +453,20 @@
         .info-box strong {
             color: #667eea;
         }
+
+        .language-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
+
+        .language-label {
+            font-size: 0.85em;
+            color: #999;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
     </style>
 </head>
 <body>
@@ -468,7 +487,7 @@
         <div id="add" class="tab-content active">
             <h2>新增單字</h2>
             <div class="info-box">
-                <strong>💡 提示：</strong>輸入單字、詞性和例句，系統會自動按日期分類。
+                <strong>💡 提示：</strong>輸入單字、詞性、中文意思和例句。日文欄位為選填。
             </div>
 
             <div class="input-group">
@@ -493,28 +512,24 @@
             </div>
 
             <div class="input-group">
-                <label for="sentence">例句 *</label>
-                <textarea id="sentence" placeholder="例：The beautiful sunset painted the sky with orange and pink colors." required></textarea>
-            </div>
-
-            <div class="input-group">
                 <label for="meaning">中文意思 *</label>
                 <input type="text" id="meaning" placeholder="例：漂亮、美麗" required>
             </div>
 
             <div class="input-group">
-                <label for="translation">例句中文翻譯 (選填)</label>
-                <textarea id="translation" placeholder="例：美麗的夕陽將天空染成橙色和粉紅色。" style="min-height: 60px;"></textarea>
+                <label for="sentence">英文例句 *</label>
+                <textarea id="sentence" placeholder="例：The beautiful sunset painted the sky with orange and pink colors." required></textarea>
             </div>
-            <div class="input-group">
-    <label for="japaneseMeaning">日文意思 (選填)</label>
-    <input type="text" id="japaneseMeaning" placeholder="例：美しい、綺麗">
-</div>
 
-<div class="input-group">
-    <label for="japaneseSentence">日文例句 (選填)</label>
-    <textarea id="japaneseSentence" placeholder="例：その美しい夕焼けは空をオレンジ色とピンク色に染めた。" style="min-height: 60px;"></textarea>
-</div>
+            <div class="input-group">
+                <label for="japaneseMeaning">日文意思 (選填)</label>
+                <input type="text" id="japaneseMeaning" placeholder="例：美しい、綺麗">
+            </div>
+
+            <div class="input-group">
+                <label for="japaneseSentence">日文例句 (選填)</label>
+                <textarea id="japaneseSentence" placeholder="例：その美しい夕焼けは空をオレンジ色とピンク色に染めた。" style="min-height: 60px;"></textarea>
+            </div>
 
             <div class="button-group">
                 <button class="btn-primary" onclick="addVocab()">保存單字</button>
@@ -591,7 +606,6 @@
     </div>
 
     <script>
-        // ===== 基礎操作 =====
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -604,7 +618,6 @@
             if (tabName === 'stats') updateStats();
         }
 
-        // ===== localStorage 操作 =====
         function getVocabList() {
             return JSON.parse(localStorage.getItem('vocabList')) || [];
         }
@@ -613,19 +626,16 @@
             localStorage.setItem('vocabList', JSON.stringify(list));
         }
 
-        // ===== 新增單字 =====
         function addVocab() {
             const word = document.getElementById('word').value.trim();
             const pos = document.getElementById('pos').value;
-            const sentence = document.getElementById('sentence').value.trim();
             const meaning = document.getElementById('meaning').value.trim();
-            const translation = document.getElementById('translation').value.trim();
-            const translation = document.getElementById('translation').value.trim();
+            const sentence = document.getElementById('sentence').value.trim();
             const japaneseMeaning = document.getElementById('japaneseMeaning').value.trim();
             const japaneseSentence = document.getElementById('japaneseSentence').value.trim();
             const messageEl = document.getElementById('message');
 
-            if (!word || !pos || !sentence || !meaning) {
+            if (!word || !pos || !meaning || !sentence) {
                 messageEl.innerHTML = '<span style="color: #ff6b6b;">❌ 請填寫必填欄位</span>';
                 return;
             }
@@ -635,9 +645,8 @@
                 id: Date.now(),
                 word: word,
                 pos: pos,
-                sentence: sentence,
                 meaning: meaning,
-                translation: translation,
+                sentence: sentence,
                 japaneseMeaning: japaneseMeaning,
                 japaneseSentence: japaneseSentence,
                 date: today,
@@ -659,15 +668,13 @@
         function clearForm() {
             document.getElementById('word').value = '';
             document.getElementById('pos').value = '';
-            document.getElementById('sentence').value = '';
             document.getElementById('meaning').value = '';
-            document.getElementById('translation').value = '';
-            document.getElementById('word').focus();
+            document.getElementById('sentence').value = '';
             document.getElementById('japaneseMeaning').value = '';
             document.getElementById('japaneseSentence').value = '';
+            document.getElementById('word').focus();
         }
 
-        // ===== 瀏覽和篩選 =====
         function filterVocab() {
             const filterPos = document.getElementById('filterPos').value;
             const searchWord = document.getElementById('searchWord').value.toLowerCase();
@@ -679,7 +686,6 @@
                 return matchPos && matchWord;
             });
 
-            // 按日期倒序分組
             const grouped = {};
             filtered.forEach(item => {
                 if (!grouped[item.date]) grouped[item.date] = [];
@@ -710,11 +716,18 @@
                     html += `<div class="vocab-item">
                         <div class="vocab-info">
                             <div class="vocab-word">${item.word}</div>
-                            <div style="font-size: 1.1em; color: #667eea; font-weight: 600; margin-bottom: 8px;">${item.meaning}</div>
+                            <div class="vocab-meaning">${item.meaning}</div>
                             <div class="vocab-meta">
                                 <span class="tag">${item.pos}</span>
                             </div>
                             <div class="vocab-sentence">${item.sentence}</div>
+                            ${item.japaneseMeaning || item.japaneseSentence ? `
+                                <div class="language-section">
+                                    <div class="language-label">🇯🇵 日文</div>
+                                    ${item.japaneseMeaning ? `<div class="vocab-meaning">${item.japaneseMeaning}</div>` : ''}
+                                    ${item.japaneseSentence ? `<div class="vocab-sentence">${item.japaneseSentence}</div>` : ''}
+                                </div>
+                            ` : ''}
                         </div>
                         <button class="btn-danger" onclick="deleteVocab(${item.id})">刪除</button>
                     </div>`;
@@ -735,7 +748,6 @@
             }
         }
 
-        // ===== 單字卡模式 =====
         let currentCardIndex = 0;
         let weekVocabs = [];
         let isCardFlipped = false;
@@ -756,7 +768,6 @@
             let list = getVocabList();
             weekVocabs = list.filter(item => item.date >= weekStart && item.date <= weekEnd);
 
-            // 打亂順序
             weekVocabs.sort(() => Math.random() - 0.5);
 
             const startDate = new Date(weekStart);
@@ -782,22 +793,26 @@
             const card = weekVocabs[currentCardIndex];
             const progress = ((currentCardIndex + 1) / weekVocabs.length * 100).toFixed(0);
 
-            // 正面：英文單字 + 詞性
             document.getElementById('sentenceDisplay').innerHTML = `
-                <div class="card-word" style="font-size: 2.5em; margin-bottom: 30px;">${card.word}</div>
+                <div class="card-word">${card.word}</div>
                 <div class="card-pos">${card.pos}</div>
             `;
 
-            // 反面：中文意思 + 例句
             document.getElementById('answerWord').textContent = card.meaning;
             document.getElementById('answerPos').textContent = '';
             document.getElementById('answerSentence').innerHTML = `
-    <div style="margin-top: 20px; border-top: 1px solid #ddd; padding-top: 20px;">
-        <div style="font-size: 0.9em; color: #999; margin-bottom: 10px;">例句</div>
-        <div style="font-size: 1em; color: #555; line-height: 1.6;">${card.sentence}</div>
-        ${card.japaneseSentence ? `<div style="margin-top: 15px; font-size: 0.95em; color: #888;">🇯🇵 ${card.japaneseSentence}</div>` : ''}
-    </div>
-`;
+                <div style="margin-top: 20px; border-top: 1px solid #ddd; padding-top: 20px;">
+                    <div style="font-size: 0.9em; color: #999; margin-bottom: 10px;">例句</div>
+                    <div style="font-size: 1em; color: #555; line-height: 1.6;">${card.sentence}</div>
+                    ${card.japaneseMeaning || card.japaneseSentence ? `
+                        <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
+                            <div style="font-size: 0.9em; color: #999; margin-bottom: 8px;">🇯🇵 日文</div>
+                            ${card.japaneseMeaning ? `<div style="font-size: 0.95em; color: #667eea; font-weight: 600; margin-bottom: 8px;">${card.japaneseMeaning}</div>` : ''}
+                            ${card.japaneseSentence ? `<div style="font-size: 0.95em; color: #555; line-height: 1.5;">${card.japaneseSentence}</div>` : ''}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
 
             document.getElementById('cardStats').innerHTML = `
                 ${currentCardIndex + 1} / ${weekVocabs.length} 
@@ -806,11 +821,9 @@
                 </div>
             `;
 
-            // 重置卡片翻轉
             isCardFlipped = false;
             document.getElementById('cardArea').classList.remove('flipped');
 
-            // 更新按鈕狀態
             document.getElementById('prevBtn').disabled = currentCardIndex === 0;
             document.getElementById('nextBtn').disabled = currentCardIndex === weekVocabs.length - 1;
         }
@@ -834,7 +847,6 @@
             }
         }
 
-        // ===== 統計 =====
         function updateStats() {
             let list = getVocabList();
             
@@ -843,21 +855,18 @@
                 return;
             }
 
-            // 按日期統計
             const dateStats = {};
             list.forEach(item => {
                 if (!dateStats[item.date]) dateStats[item.date] = 0;
                 dateStats[item.date]++;
             });
 
-            // 按詞性統計
             const posStats = {};
             list.forEach(item => {
                 if (!posStats[item.pos]) posStats[item.pos] = 0;
                 posStats[item.pos]++;
             });
 
-            // 本週統計
             const weekStart = getWeekStartDate();
             const weekEnd = new Date(new Date(weekStart).getTime() + 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
             const weekCount = list.filter(item => item.date >= weekStart && item.date <= weekEnd).length;
@@ -903,7 +912,6 @@
             document.getElementById('statsContent').innerHTML = html;
         }
 
-        // 初始化
         window.addEventListener('load', () => {
             filterVocab();
         });
