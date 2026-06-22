@@ -506,6 +506,15 @@
                 <label for="translation">例句中文翻譯 (選填)</label>
                 <textarea id="translation" placeholder="例：美麗的夕陽將天空染成橙色和粉紅色。" style="min-height: 60px;"></textarea>
             </div>
+            <div class="input-group">
+    <label for="japaneseMeaning">日文意思 (選填)</label>
+    <input type="text" id="japaneseMeaning" placeholder="例：美しい、綺麗">
+</div>
+
+<div class="input-group">
+    <label for="japaneseSentence">日文例句 (選填)</label>
+    <textarea id="japaneseSentence" placeholder="例：その美しい夕焼けは空をオレンジ色とピンク色に染めた。" style="min-height: 60px;"></textarea>
+</div>
 
             <div class="button-group">
                 <button class="btn-primary" onclick="addVocab()">保存單字</button>
@@ -611,6 +620,9 @@
             const sentence = document.getElementById('sentence').value.trim();
             const meaning = document.getElementById('meaning').value.trim();
             const translation = document.getElementById('translation').value.trim();
+            const translation = document.getElementById('translation').value.trim();
+            const japaneseMeaning = document.getElementById('japaneseMeaning').value.trim();
+            const japaneseSentence = document.getElementById('japaneseSentence').value.trim();
             const messageEl = document.getElementById('message');
 
             if (!word || !pos || !sentence || !meaning) {
@@ -626,6 +638,8 @@
                 sentence: sentence,
                 meaning: meaning,
                 translation: translation,
+                japaneseMeaning: japaneseMeaning,
+                japaneseSentence: japaneseSentence,
                 date: today,
                 createTime: new Date().toLocaleString('zh-TW')
             };
@@ -649,6 +663,8 @@
             document.getElementById('meaning').value = '';
             document.getElementById('translation').value = '';
             document.getElementById('word').focus();
+            document.getElementById('japaneseMeaning').value = '';
+            document.getElementById('japaneseSentence').value = '';
         }
 
         // ===== 瀏覽和篩選 =====
@@ -776,11 +792,12 @@
             document.getElementById('answerWord').textContent = card.meaning;
             document.getElementById('answerPos').textContent = '';
             document.getElementById('answerSentence').innerHTML = `
-                <div style="margin-top: 20px; border-top: 1px solid #ddd; padding-top: 20px;">
-                    <div style="font-size: 0.9em; color: #999; margin-bottom: 10px;">例句</div>
-                    <div style="font-size: 1em; color: #555; line-height: 1.6;">${card.sentence}</div>
-                </div>
-            `;
+    <div style="margin-top: 20px; border-top: 1px solid #ddd; padding-top: 20px;">
+        <div style="font-size: 0.9em; color: #999; margin-bottom: 10px;">例句</div>
+        <div style="font-size: 1em; color: #555; line-height: 1.6;">${card.sentence}</div>
+        ${card.japaneseSentence ? `<div style="margin-top: 15px; font-size: 0.95em; color: #888;">🇯🇵 ${card.japaneseSentence}</div>` : ''}
+    </div>
+`;
 
             document.getElementById('cardStats').innerHTML = `
                 ${currentCardIndex + 1} / ${weekVocabs.length} 
